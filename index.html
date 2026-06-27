@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Post-Industrial School</title>
+<meta name="description" content="A research program studying how the dissolution of the industrial order restructures the production of meaning."/>
+<meta property="og:title" content="The Post-Industrial School"/>
+<meta property="og:description" content="The industrial order issued a shared sense of where we were going. That story is gone. This studies what gets built in the gap."/>
+<meta property="og:type" content="website"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Archivo+Narrow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FCFCFB;
+    --ink:#15171A;
+    --plot:#7C97E8;
+    --grid:#E9EAEC;
+    --grid-strong:#DDDFE2;
+    --grey:#6E7378;
+    --win:#FFFFFF;
+    --winbar:#ECECEE;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  body{
+    background:var(--paper);color:var(--ink);
+    font-family:'Inter',-apple-system,sans-serif;line-height:1.5;
+    overflow-x:hidden;
+  }
+  ::selection{background:var(--plot);color:#fff;}
+  a{color:inherit;}
+  .grid-bg{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:
+      linear-gradient(var(--grid) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:clamp(60px,9vw,128px) clamp(60px,9vw,128px);
+  }
+  .wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:0 clamp(18px,4vw,56px);}
+
+  /* top bar: ascii face + small label */
+  header.bar{display:flex;justify-content:space-between;align-items:flex-start;padding:24px 0 0;}
+  .face{font-family:'Courier New',monospace;font-size:15px;color:var(--plot);letter-spacing:0.05em;}
+  .barnote{font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:var(--grey);text-align:right;line-height:1.6;}
+
+  /* ===== DESKTOP HERO ===== */
+  .desk{position:relative;min-height:clamp(560px,82vh,820px);margin-top:8px;}
+  /* x-plot floating top-right */
+  .plot-svg{position:absolute;top:2%;right:-2%;width:min(60%,720px);height:auto;overflow:visible;z-index:1;opacity:.95;pointer-events:none;}
+  .plot-svg text{font-family:'Courier New',monospace;font-size:12px;fill:var(--plot);}
+
+  /* scattered title type placed on the grid */
+  .scatter{position:absolute;z-index:2;}
+  .t-serif{font-family:'Newsreader',serif;font-weight:400;letter-spacing:-0.01em;line-height:0.9;}
+  .t-sans{font-family:'Archivo Narrow',sans-serif;line-height:0.9;}
+  .t-bold{font-family:'Inter',sans-serif;font-weight:700;letter-spacing:-0.02em;line-height:0.85;}
+  .muted{color:var(--grey);}
+  .ul{border-bottom:1.5px solid var(--ink);padding-bottom:3px;}
+  .ann{font-family:'Inter',sans-serif;font-size:12px;line-height:1.3;color:var(--grey);font-weight:400;letter-spacing:0;}
+
+  /* title cluster */
+  .h-the{font-size:clamp(15px,1.8vw,20px);}
+  .h-post{font-size:clamp(40px,7vw,92px);}
+  .h-school{font-size:clamp(40px,7vw,92px);}
+  .h-sub{font-size:clamp(15px,1.7vw,21px);}
+
+  /* folders */
+  .folder{position:absolute;z-index:3;width:96px;text-align:center;cursor:pointer;user-select:none;
+    -webkit-user-select:none;touch-action:manipulation;}
+  .folder .ico{width:78px;height:60px;margin:0 auto;position:relative;filter:drop-shadow(0 2px 3px rgba(0,0,0,.13));transition:transform .12s ease;}
+  .folder:hover .ico{transform:translateY(-2px) scale(1.02);}
+  .folder svg{width:100%;height:100%;display:block;}
+  .folder .lbl{margin-top:7px;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:var(--ink);}
+  .folder .cnt{font-family:'Courier New',monospace;font-size:10px;color:var(--grey);margin-top:1px;}
+
+  /* ===== WINDOWS ===== */
+  .win{position:fixed;z-index:50;width:min(440px,90vw);background:var(--win);
+    border:1px solid #C9CBCE;border-radius:9px;box-shadow:0 18px 50px rgba(20,23,26,.22),0 2px 8px rgba(20,23,26,.12);
+    display:none;flex-direction:column;overflow:hidden;}
+  .win.open{display:flex;}
+  .win .bar2{height:34px;background:var(--winbar);border-bottom:1px solid #D7D8DB;
+    display:flex;align-items:center;padding:0 12px;gap:8px;cursor:grab;}
+  .win .bar2.grabbing{cursor:grabbing;}
+  .dots{display:flex;gap:7px;}
+  .dot{width:12px;height:12px;border-radius:50%;}
+  .dot.r{background:#F5655B;border:1px solid #E14640;cursor:pointer;}
+  .dot.y{background:#F6BE4F;border:1px solid #E0A23B;}
+  .dot.g{background:#62C654;border:1px solid #4FAE43;}
+  .win .wtitle{font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#3a3d40;
+    position:absolute;left:0;right:0;text-align:center;pointer-events:none;}
+  .win .content{padding:22px;font-size:14.5px;line-height:1.62;color:#26292d;max-height:64vh;overflow-y:auto;}
+  .win .content h4{font-family:'Archivo Narrow',sans-serif;text-transform:uppercase;letter-spacing:.04em;
+    font-size:13px;color:var(--grey);margin-bottom:14px;}
+  .win .content a{color:var(--ink);border-bottom:1px solid var(--plot);text-decoration:none;}
+  .win .content a:hover{color:var(--plot);}
+  .win-link{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-top:1px solid var(--grid);}
+  .win-link:first-of-type{border-top:none;}
+  .win-link .k{font-weight:500;color:var(--ink);}
+  .win-link .v{font-family:'Courier New',monospace;font-size:12px;color:var(--grey);}
+  .win-empty{font-family:'Courier New',monospace;font-size:13px;color:var(--grey);text-align:center;padding:30px 0;}
+
+  /* ===== ESSAY (scrollable, redistributed) ===== */
+  section.block{position:relative;z-index:1;padding:52px 0;border-top:1px solid var(--grid-strong);}
+  .row-label{font-family:'Archivo Narrow',sans-serif;font-size:12px;letter-spacing:0.16em;
+    text-transform:uppercase;color:var(--grey);margin-bottom:20px;display:flex;gap:10px;align-items:center;}
+  .row-label::before{content:"";width:7px;height:7px;background:var(--plot);}
+  /* staggered, desktop-ish column offsets */
+  .lead{font-family:'Newsreader',serif;font-size:clamp(21px,2.9vw,33px);line-height:1.3;max-width:22ch;font-weight:400;letter-spacing:-.005em;}
+  .body-col{margin-top:24px;}
+  .body-col p{font-size:clamp(15px,1.5vw,17px);line-height:1.62;max-width:58ch;margin-bottom:16px;color:#26292d;}
+  .body-col p:last-child{margin-bottom:0;}
+  .body-col em{font-style:normal;color:var(--plot);font-weight:500;}
+  .indent{margin-left:clamp(0px,12vw,160px);}
+  .indent2{margin-left:clamp(0px,24vw,300px);}
+
+  .entry{display:grid;grid-template-columns:auto 1fr;gap:20px;padding:20px 0;border-top:1px solid var(--grid);}
+  .entry:first-of-type{border-top:none;}
+  .entry .n{font-family:'Courier New',monospace;font-size:13px;color:var(--plot);padding-top:5px;}
+  .entry h3{font-family:'Archivo Narrow',sans-serif;font-weight:600;text-transform:uppercase;
+    font-size:clamp(17px,2vw,22px);letter-spacing:.01em;margin-bottom:9px;line-height:1.05;}
+  .entry p{font-size:clamp(14px,1.4vw,16px);line-height:1.58;max-width:58ch;color:#26292d;}
+
+  .turn-head{font-family:'Newsreader',serif;font-size:clamp(28px,5.2vw,58px);line-height:1.0;
+    letter-spacing:-.01em;max-width:17ch;margin-bottom:28px;font-weight:400;}
+  .turn-head .pl{color:var(--plot);}
+
+  footer.foot{position:relative;z-index:1;padding:34px 0 60px;border-top:1px solid var(--grid-strong);
+    display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;}
+  .foot .nm{font-family:'Archivo Narrow',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.04em;font-size:14px;}
+  .foot .me{font-size:13px;color:var(--grey);margin-top:5px;}
+  .foot .yr{font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--grey);}
+
+  /* responsive: collapse scattered desktop into stacked flow on small screens */
+  @media (max-width:760px){
+    .desk{min-height:0;display:flex;flex-direction:column;gap:4px;padding-bottom:20px;}
+    .scatter{position:static!important;left:auto!important;top:auto!important;right:auto!important;}
+    .plot-svg{position:static;width:100%;margin:14px 0 6px;order:-1;}
+    .folder{position:static!important;display:inline-block;margin:14px 18px 0 0;width:84px;}
+    .folder-row{display:flex;flex-wrap:wrap;}
+    .indent,.indent2{margin-left:0;}
+    .h-post,.h-school{font-size:46px;}
+  }
+  @media (prefers-reduced-motion:reduce){.folder:hover .ico{transform:none;}}
+</style></head>
+<body>
+<div class="grid-bg"></div>
+<div class="wrap">
+
+  <header class="bar">
+    <div class="face">[ x_x ]</div>
+    <div class="barnote">A Research Program<br/>Media &amp; Culture After<br/>the Industrial Order</div>
+  </header>
+
+  <div class="desk" id="desk">
+    <svg class="plot-svg" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><text x="40.0" y="322.1">x</text>
+<text x="42.2" y="320.4">x</text>
+<text x="44.4" y="321.5">x</text>
+<text x="46.5" y="329.8">x</text>
+<text x="48.7" y="336.2">x</text>
+<text x="50.9" y="319.4">x</text>
+<text x="53.2" y="315.1">x</text>
+<text x="55.4" y="327.6">x</text>
+<text x="57.5" y="310.5">x</text>
+<text x="59.7" y="320.2">x</text>
+<text x="61.9" y="321.6">x</text>
+<text x="64.1" y="324.3">x</text>
+<text x="66.3" y="322.1">x</text>
+<text x="68.5" y="323.6">x</text>
+<text x="70.6" y="327.1">x</text>
+<text x="72.8" y="318.4">x</text>
+<text x="75.1" y="322.3">x</text>
+<text x="77.3" y="318.8">x</text>
+<text x="79.5" y="332.5">x</text>
+<text x="81.6" y="317.5">x</text>
+<text x="83.8" y="305.7">x</text>
+<text x="86.0" y="311.2">x</text>
+<text x="88.2" y="316.4">x</text>
+<text x="90.4" y="322.1">x</text>
+<text x="92.5" y="328.5">x</text>
+<text x="94.7" y="307.3">x</text>
+<text x="96.9" y="305.2">x</text>
+<text x="99.2" y="320.3">x</text>
+<text x="101.4" y="318.2">x</text>
+<text x="103.5" y="323.1">x</text>
+<text x="105.7" y="307.1">x</text>
+<text x="107.9" y="300.6">x</text>
+<text x="110.1" y="297.8">x</text>
+<text x="112.3" y="304.1">x</text>
+<text x="114.5" y="301.3">x</text>
+<text x="116.6" y="305.9">x</text>
+<text x="118.8" y="305.7">x</text>
+<text x="121.1" y="307.7">x</text>
+<text x="123.3" y="318.8">x</text>
+<text x="125.5" y="298.9">x</text>
+<text x="127.6" y="309.9">x</text>
+<text x="129.8" y="313.6">x</text>
+<text x="132.0" y="304.2">x</text>
+<text x="134.2" y="316.1">x</text>
+<text x="136.4" y="305.1">x</text>
+<text x="138.5" y="298.6">x</text>
+<text x="140.7" y="308.2">x</text>
+<text x="142.9" y="299.1">x</text>
+<text x="145.2" y="299.1">x</text>
+<text x="147.4" y="304.6">x</text>
+<text x="149.5" y="310.4">x</text>
+<text x="151.7" y="299.1">x</text>
+<text x="153.9" y="313.0">x</text>
+<text x="156.1" y="313.2">x</text>
+<text x="158.3" y="297.7">x</text>
+<text x="160.5" y="312.2">x</text>
+<text x="162.6" y="297.6">x</text>
+<text x="164.8" y="303.1">x</text>
+<text x="167.1" y="310.1">x</text>
+<text x="169.3" y="291.8">x</text>
+<text x="171.5" y="292.9">x</text>
+<text x="173.6" y="297.6">x</text>
+<text x="175.8" y="306.0">x</text>
+<text x="178.0" y="286.0">x</text>
+<text x="180.2" y="299.4">x</text>
+<text x="182.4" y="295.2">x</text>
+<text x="184.5" y="297.4">x</text>
+<text x="186.7" y="292.6">x</text>
+<text x="188.9" y="303.7">x</text>
+<text x="191.2" y="294.0">x</text>
+<text x="193.4" y="293.7">x</text>
+<text x="195.5" y="305.0">x</text>
+<text x="197.7" y="304.9">x</text>
+<text x="199.9" y="286.5">x</text>
+<text x="202.1" y="297.6">x</text>
+<text x="204.3" y="296.9">x</text>
+<text x="206.5" y="297.5">x</text>
+<text x="208.6" y="294.3">x</text>
+<text x="210.8" y="288.1">x</text>
+<text x="213.1" y="287.2">x</text>
+<text x="215.3" y="282.5">x</text>
+<text x="217.5" y="283.9">x</text>
+<text x="219.6" y="293.5">x</text>
+<text x="221.8" y="290.6">x</text>
+<text x="224.0" y="298.2">x</text>
+<text x="226.2" y="295.5">x</text>
+<text x="228.4" y="277.9">x</text>
+<text x="230.5" y="295.5">x</text>
+<text x="232.7" y="287.8">x</text>
+<text x="234.9" y="281.1">x</text>
+<text x="237.2" y="275.9">x</text>
+<text x="239.4" y="271.6">x</text>
+<text x="241.5" y="280.9">x</text>
+<text x="243.7" y="273.8">x</text>
+<text x="245.9" y="273.6">x</text>
+<text x="248.1" y="284.7">x</text>
+<text x="250.3" y="279.1">x</text>
+<text x="252.5" y="282.1">x</text>
+<text x="254.6" y="288.6">x</text>
+<text x="256.8" y="271.6">x</text>
+<text x="259.1" y="281.4">x</text>
+<text x="261.3" y="289.0">x</text>
+<text x="263.5" y="270.3">x</text>
+<text x="265.6" y="273.8">x</text>
+<text x="267.8" y="275.3">x</text>
+<text x="270.0" y="268.5">x</text>
+<text x="272.2" y="273.0">x</text>
+<text x="274.4" y="266.4">x</text>
+<text x="276.5" y="262.9">x</text>
+<text x="278.7" y="277.4">x</text>
+<text x="280.9" y="280.8">x</text>
+<text x="283.2" y="268.1">x</text>
+<text x="285.4" y="283.8">x</text>
+<text x="287.5" y="275.6">x</text>
+<text x="289.7" y="282.0">x</text>
+<text x="291.9" y="281.6">x</text>
+<text x="294.1" y="257.6">x</text>
+<text x="296.3" y="278.2">x</text>
+<text x="298.5" y="273.8">x</text>
+<text x="300.6" y="274.9">x</text>
+<text x="302.8" y="262.2">x</text>
+<text x="305.1" y="265.9">x</text>
+<text x="307.3" y="278.2">x</text>
+<text x="309.5" y="274.1">x</text>
+<text x="311.6" y="254.9">x</text>
+<text x="313.8" y="263.3">x</text>
+<text x="316.0" y="263.1">x</text>
+<text x="318.2" y="261.6">x</text>
+<text x="320.4" y="261.1">x</text>
+<text x="322.5" y="269.5">x</text>
+<text x="324.7" y="273.9">x</text>
+<text x="326.9" y="270.6">x</text>
+<text x="329.2" y="268.3">x</text>
+<text x="331.4" y="266.9">x</text>
+<text x="333.5" y="270.8">x</text>
+<text x="335.7" y="261.5">x</text>
+<text x="337.9" y="256.6">x</text>
+<text x="340.1" y="269.7">x</text>
+<text x="342.3" y="269.1">x</text>
+<text x="344.5" y="262.8">x</text>
+<text x="346.6" y="256.1">x</text>
+<text x="348.8" y="264.3">x</text>
+<text x="351.1" y="254.0">x</text>
+<text x="353.3" y="271.7">x</text>
+<text x="355.5" y="270.9">x</text>
+<text x="357.6" y="250.2">x</text>
+<text x="359.8" y="258.0">x</text>
+<text x="362.0" y="248.4">x</text>
+<text x="364.2" y="265.5">x</text>
+<text x="366.4" y="252.3">x</text>
+<text x="368.5" y="244.4">x</text>
+<text x="370.7" y="252.8">x</text>
+<text x="372.9" y="243.6">x</text>
+<text x="375.2" y="242.0">x</text>
+<text x="377.4" y="264.2">x</text>
+<text x="379.5" y="251.6">x</text>
+<text x="381.7" y="248.8">x</text>
+<text x="383.9" y="258.1">x</text>
+<text x="386.1" y="243.2">x</text>
+<text x="388.3" y="266.7">x</text>
+<text x="390.5" y="253.1">x</text>
+<text x="392.6" y="240.2">x</text>
+<text x="394.8" y="265.8">x</text>
+<text x="397.1" y="236.9">x</text>
+<text x="399.3" y="261.5">x</text>
+<text x="401.5" y="244.2">x</text>
+<text x="403.6" y="252.9">x</text>
+<text x="405.8" y="237.1">x</text>
+<text x="408.0" y="231.4">x</text>
+<text x="410.2" y="239.9">x</text>
+<text x="412.4" y="245.6">x</text>
+<text x="414.5" y="251.1">x</text>
+<text x="416.7" y="257.8">x</text>
+<text x="418.9" y="247.3">x</text>
+<text x="421.2" y="253.9">x</text>
+<text x="423.4" y="240.0">x</text>
+<text x="425.5" y="255.9">x</text>
+<text x="427.7" y="255.4">x</text>
+<text x="432.1" y="233.5">x</text>
+<text x="434.3" y="251.6">x</text>
+<text x="436.5" y="237.7">x</text>
+<text x="438.6" y="228.6">x</text>
+<text x="440.8" y="261.3">x</text>
+<text x="443.1" y="239.6">x</text>
+<text x="445.3" y="241.8">x</text>
+<text x="447.5" y="216.2">x</text>
+<text x="449.6" y="253.0">x</text>
+<text x="451.8" y="241.7">x</text>
+<text x="456.2" y="226.7">x</text>
+<text x="458.4" y="241.4">x</text>
+<text x="460.5" y="213.7">x</text>
+<text x="462.7" y="251.9">x</text>
+<text x="464.9" y="255.0">x</text>
+<text x="467.2" y="218.5">x</text>
+<text x="469.4" y="260.0">x</text>
+<text x="473.7" y="223.6">x</text>
+<text x="475.9" y="251.3">x</text>
+<text x="478.1" y="254.4">x</text>
+<text x="480.3" y="224.1">x</text>
+<text x="482.5" y="218.8">x</text>
+<text x="486.8" y="257.2">x</text>
+<text x="489.1" y="211.5">x</text>
+<text x="491.3" y="215.9">x</text>
+<text x="493.5" y="251.0">x</text>
+<text x="495.6" y="245.9">x</text>
+<text x="497.8" y="235.4">x</text>
+<text x="500.0" y="215.8">x</text>
+<text x="502.2" y="230.3">x</text>
+<text x="504.4" y="253.5">x</text>
+<text x="508.7" y="192.0">x</text>
+<text x="510.9" y="261.6">x</text>
+<text x="513.2" y="246.3">x</text>
+<text x="515.4" y="249.1">x</text>
+<text x="517.5" y="201.7">x</text>
+<text x="519.7" y="211.9">x</text>
+<text x="521.9" y="191.1">x</text>
+<text x="524.1" y="209.8">x</text>
+<text x="526.3" y="186.8">x</text>
+<text x="528.5" y="223.6">x</text>
+<text x="532.8" y="208.9">x</text>
+<text x="535.1" y="254.7">x</text>
+<text x="541.6" y="208.4">x</text>
+<text x="543.8" y="233.3">x</text>
+<text x="546.0" y="206.9">x</text>
+<text x="548.2" y="223.8">x</text>
+<text x="550.4" y="247.2">x</text>
+<text x="552.5" y="260.9">x</text>
+<text x="554.7" y="255.1">x</text>
+<text x="556.9" y="242.5">x</text>
+<text x="559.2" y="218.0">x</text>
+<text x="561.4" y="192.7">x</text>
+<text x="565.7" y="180.9">x</text>
+<text x="567.9" y="240.9">x</text>
+<text x="570.1" y="223.4">x</text>
+<text x="572.3" y="210.5">x</text>
+<text x="574.5" y="174.3">x</text>
+<text x="576.6" y="241.6">x</text>
+<text x="578.8" y="203.0">x</text>
+<text x="581.1" y="175.8">x</text>
+<text x="585.5" y="208.3">x</text>
+<text x="592.0" y="221.1">x</text>
+<text x="594.2" y="240.8">x</text>
+<text x="596.4" y="235.6">x</text>
+<text x="600.7" y="178.3">x</text>
+<text x="607.4" y="171.5">x</text>
+<text x="611.7" y="174.5">x</text>
+<text x="613.9" y="241.2">x</text>
+<text x="616.1" y="195.6">x</text>
+<text x="618.3" y="231.0">x</text>
+<text x="622.6" y="175.8">x</text>
+<text x="627.1" y="163.4">x</text>
+<text x="629.3" y="144.5">x</text>
+<text x="631.5" y="175.9">x</text>
+<text x="638.0" y="249.0">x</text>
+<text x="640.2" y="149.2">x</text>
+<text x="644.5" y="173.3">x</text>
+<text x="648.9" y="148.6">x</text>
+<text x="653.4" y="234.2">x</text>
+<text x="657.7" y="145.8">x</text>
+<text x="659.9" y="227.3">x</text>
+<text x="664.3" y="229.9">x</text>
+<text x="666.5" y="208.2">x</text>
+<text x="668.6" y="174.8">x</text>
+<text x="670.8" y="240.4">x</text>
+<text x="673.1" y="236.8">x</text>
+<text x="681.8" y="191.4">x</text>
+<text x="688.4" y="166.7">x</text>
+<text x="697.2" y="252.8">x</text>
+<text x="701.5" y="217.0">x</text>
+<text x="703.7" y="135.2">x</text>
+<text x="705.9" y="161.9">x</text>
+<text x="708.1" y="162.0">x</text>
+<text x="714.6" y="171.4">x</text>
+<text x="716.8" y="244.7">x</text>
+<text x="725.6" y="155.4">x</text>
+<text x="732.2" y="206.8">x</text>
+<text x="734.4" y="250.0">x</text>
+<text x="745.4" y="211.8">x</text>
+<text x="749.7" y="244.0">x</text>
+<text x="751.9" y="218.6">x</text>
+<text x="754.1" y="143.6">x</text>
+<text x="758.5" y="118.9">x</text>
+<text x="762.8" y="131.1">x</text>
+<text x="817.6" y="239.2">x</text>
+<text x="822.0" y="241.8">x</text>
+<text x="837.4" y="200.9">x</text>
+<text x="839.5" y="121.2">x</text>
+<text x="850.5" y="181.0">x</text>
+<text x="852.6" y="169.6">x</text>
+<text x="896.5" y="222.6">x</text>
+<text x="924.9" y="217.7">x</text>
+<text x="929.4" y="108.8">x</text>
+<text x="931.5" y="52.1">x</text>
+<text x="844.0" y="464.9">x</text>
+<text x="763.2" y="210.4">x</text>
+<text x="868.5" y="421.0">x</text>
+<text x="917.7" y="323.9">x</text>
+<text x="808.8" y="204.1">x</text>
+<text x="658.5" y="388.4">x</text>
+<text x="719.0" y="323.0">x</text>
+<text x="770.9" y="340.2">x</text>
+<text x="685.5" y="149.6">x</text>
+<text x="658.5" y="166.1">x</text>
+<text x="797.2" y="449.4">x</text>
+<text x="940.6" y="463.6">x</text>
+<text x="812.1" y="279.0">x</text>
+<text x="736.6" y="297.4">x</text>
+<text x="947.4" y="493.0">x</text>
+<text x="606.3" y="228.1">x</text>
+<text x="830.0" y="490.8">x</text>
+<text x="870.9" y="174.0">x</text>
+<text x="686.6" y="180.7">x</text>
+<text x="654.0" y="221.8">x</text>
+<text x="919.1" y="186.3">x</text>
+<text x="823.2" y="298.9">x</text>
+<text x="644.5" y="215.8">x</text>
+<text x="854.7" y="335.2">x</text>
+<text x="912.4" y="231.9">x</text>
+<text x="715.1" y="196.4">x</text>
+<text x="709.0" y="461.2">x</text>
+<text x="837.9" y="212.0">x</text>
+<text x="697.3" y="228.8">x</text>
+<text x="932.4" y="171.1">x</text>
+<text x="700.0" y="488.3">x</text></svg>
+
+    <!-- scattered title -->
+    <div class="scatter t-the" style="left:1%;top:34%;"><span class="t-sans h-the muted">the</span></div>
+    <div class="scatter" style="left:1%;top:38%;"><span class="t-serif h-post">Post-Industrial</span></div>
+    <div class="scatter" style="left:1%;top:52%;"><span class="t-bold h-school">SCHOOL</span></div>
+    <div class="scatter" style="left:1%;top:66%;max-width:30ch;"><span class="ann">a culture that can no longer picture its future recycles its past instead. field notes from the interval.</span></div>
+
+    <!-- folders -->
+    <div class="folder" id="f-contact" style="right:6%;top:40%;">
+      <div class="ico"><svg viewBox="0 0 78 60"><path d="M3 9 a4 4 0 0 1 4-4 h22 l6 6 h36 a4 4 0 0 1 4 4 v36 a4 4 0 0 1-4 4 H7 a4 4 0 0 1-4-4 Z" fill="#5BA8F2"/><path d="M3 15 h72 v32 a4 4 0 0 1-4 4 H7 a4 4 0 0 1-4-4 Z" fill="#7CC0FA"/></svg></div><div class="lbl">Contact</div><div class="cnt">3 items</div>
+    </div>
+    <div class="folder" id="f-agenda" style="right:20%;top:58%;">
+      <div class="ico"><svg viewBox="0 0 78 60"><path d="M3 9 a4 4 0 0 1 4-4 h22 l6 6 h36 a4 4 0 0 1 4 4 v36 a4 4 0 0 1-4 4 H7 a4 4 0 0 1-4-4 Z" fill="#5BA8F2"/><path d="M3 15 h72 v32 a4 4 0 0 1-4 4 H7 a4 4 0 0 1-4-4 Z" fill="#7CC0FA"/></svg></div><div class="lbl">Agenda</div><div class="cnt">empty</div>
+    </div>
+  </div>
+
+  <!-- ESSAY -->
+  <section class="block">
+    <div class="row-label">The Condition</div>
+    <p class="lead">For 200+ years, the industrial order issued a shared sense of where we were going.</p>
+    <div class="body-col">
+      <p>It produced the factory. The school. The company. The cultural narrative. That story is now gone. A culture that can no longer picture its future recycles its nostalgic past instead.</p>
+      <p class="indent">So where did the story go? The future once had a shape you could plan toward, and that shape was what every style, movement, and aesthetic pointed at. The look followed the story. When the order that issued it came apart into platforms, algorithms and feeds, the story went with it. Almost no one named it. We felt it though. The flatness, the sense that nothing is really new, the future arriving without a shape. We had the feeling long before we had the words for it.</p>
+      <p class="indent">This is the part that gets misread. It looks like a problem of jobs, or institutions, or technology. It is none of those. It is a problem of <em>meaning</em>, the loss of a shared story about where we are going. That is the level the Post-Industrial School works at, because that is where the real change is happening, and where the next story will have to be written.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="row-label">Three Positions</div>
+    <div class="entry"><div class="n">01</div><div><h3>Aesthetics follow narrative</h3>
+      <p>No culture invents a genuinely new look until it has a new story about where it is going. Modernism had the machine age. The sixties had liberation. We have neither, which is why the safest bet in fashion, film, and design right now is the recent past. The recycling isn't taste. It's a symptom.</p></div></div>
+    <div class="entry"><div class="n">02</div><div><h3>The feed has no future tense</h3>
+      <p>Novels, films, and albums could carry an arc, a beginning that pointed at an end. The feed can't. It is engineered to loop a present, because an ending is a user who leaves. The medium that now organizes culture is structurally unable to tell a story about tomorrow, so the vacancy holds even as the volume climbs.</p></div></div>
+    <div class="entry"><div class="n">03</div><div><h3>The firm issued the self</h3>
+      <p>A job was never only income. It handed you a role, and the role handed you an identity and a place in a story that went somewhere. As AI thins the human core of the firm, that machine stops issuing selves, and people are left to author by hand what an institution used to grant automatically. The dissonance you feel at work has a structure. It isn't personal failure.</p></div></div>
+  </section>
+
+  <section class="block">
+    <div class="row-label">The Turn</div>
+    <h2 class="turn-head">The new story is already <span class="pl">forming</span>. It starts with refusal.</h2>
+    <div class="body-col">
+      <p>A vacancy this size does not stay empty. Something is already moving into it, and it is not a better-designed version of the past. When a machine can generate almost anything instantly and for free, the one thing that becomes scarce is the evidence that a human chose. Someone accepted a limit, committed to it, and could not undo it. Film grain, the single take, the handmade, the deliberately constrained. These look like nostalgia. They are something else: an early, mostly unconscious bet on where value goes next.</p>
+      <p class="indent">That is the shape of the emerging narrative. Not a story about a destination, which no one can yet supply, but a story about <em>what we refuse</em>, because refusal is the last act of authorship a machine has not taken, and a chosen limit is how a person makes a self when the old institutions have stopped issuing one. It is fragile, it is already being copied and sold back to us, and it is, so far, the realest thing in the field.</p>
+      <p class="indent">The Post-Industrial School exists to read this turn as it happens, to name the new narrative while it is still forming, instead of recognizing it only once it has hardened into a style.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="row-label">The Program</div>
+    <div class="body-col">
+      <p>Most cultural criticism describes. This program is built to <em>predict</em>. Each idea is stated as a claim that could be proven wrong, what becomes valuable next, what gets captured, which symptom surfaces after this one, so you can carry it into your own work and test it against what you actually see. The output is a written series, a set of frameworks, and research artifacts that make the transition legible.</p>
+      <p class="indent">The aim is not to mourn the order that is ending, or to sell the one being promised. It is to read the interval we are living inside, and to frame the narrative coming after it, clearly enough to act first. The new story is being written now, by whoever sees it forming. Open Contact to start a conversation.</p>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div><div class="nm">The Post-Industrial School</div><div class="me">A research program by Carson McKee</div></div>
+    <div class="yr">Est. 2026</div>
+  </footer>
+</div>
+
+<!-- WINDOWS -->
+<div class="win" id="w-contact" style="left:50%;top:22%;">
+  <div class="bar2" data-drag><div class="dots"><span class="dot r" data-close></span><span class="dot y"></span><span class="dot g"></span></div><span class="wtitle">Contact</span></div>
+  <div class="content">
+    <h4>Get in touch</h4>
+    <div class="win-link"><span class="k"><a href="mailto:YOUR-EMAIL@EXAMPLE.COM?subject=The%20Post-Industrial%20School">Send a message</a></span><span class="v">mail</span></div>
+    <div class="win-link"><span class="k"><a href="https://understandingdigitalculture.substack.com/subscribe" target="_blank" rel="noopener">Subscribe on Substack</a></span><span class="v">UDC</span></div>
+    <div class="win-link"><span class="k"><a href="https://artandmedia.io" target="_blank" rel="noopener">artandmedia.io</a></span><span class="v">www</span></div>
+  </div>
+</div>
+
+<div class="win" id="w-agenda" style="left:54%;top:30%;">
+  <div class="bar2" data-drag><div class="dots"><span class="dot r" data-close></span><span class="dot y"></span><span class="dot g"></span></div><span class="wtitle">Agenda</span></div>
+  <div class="content"><div class="win-empty">[ empty ]<br/><br/>events &amp; news, coming soon</div></div>
+</div>
+
+<script>
+(function(){
+  function openWin(id){var w=document.getElementById(id);w.classList.add('open');bringFront(w);
+    var vw=innerWidth,vh=innerHeight,r=w.getBoundingClientRect();
+    if(innerWidth<=760){w.style.left=(vw-r.width)/2+'px';w.style.top=Math.max(40,(vh-r.height)/3)+'px';}}
+  function bringFront(w){var z=51;document.querySelectorAll('.win').forEach(function(x){var cz=+x.style.zIndex||50;if(cz>=z)z=cz+1;});w.style.zIndex=z;}
+  document.getElementById('f-contact').addEventListener('click',function(){openWin('w-contact');});
+  document.getElementById('f-agenda').addEventListener('click',function(){openWin('w-agenda');});
+  document.querySelectorAll('.dot.r[data-close]').forEach(function(d){d.addEventListener('click',function(e){e.stopPropagation();d.closest('.win').classList.remove('open');});});
+  // drag
+  document.querySelectorAll('.win').forEach(function(w){
+    var bar=w.querySelector('[data-drag]');var sx,sy,ox,oy,drag=false;
+    function down(e){drag=true;bar.classList.add('grabbing');bringFront(w);
+      var p=e.touches?e.touches[0]:e;sx=p.clientX;sy=p.clientY;var r=w.getBoundingClientRect();
+      ox=r.left;oy=r.top;w.style.left=ox+'px';w.style.top=oy+'px';e.preventDefault();}
+    function move(e){if(!drag)return;var p=e.touches?e.touches[0]:e;
+      w.style.left=(ox+p.clientX-sx)+'px';w.style.top=(oy+p.clientY-sy)+'px';}
+    function up(){drag=false;bar.classList.remove('grabbing');}
+    bar.addEventListener('mousedown',down);bar.addEventListener('touchstart',down,{passive:false});
+    document.addEventListener('mousemove',move);document.addEventListener('touchmove',move,{passive:false});
+    document.addEventListener('mouseup',up);document.addEventListener('touchend',up);
+    w.addEventListener('mousedown',function(){bringFront(w);});
+  });
+})();
+</script>
+</body></html>
