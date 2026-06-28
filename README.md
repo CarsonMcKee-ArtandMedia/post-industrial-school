@@ -19,4 +19,3 @@ This is where the School's tools and pages live, built in the open. Static,
 ownable, permanent, the human-curated trace against the generated feed.
 
 - `post-industrial-school` — the School's home page
-- `reframe-builder` — a thinking tool for turning observations into reframes.
